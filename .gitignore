@@ -1,0 +1,3 @@
+build
+.*.sw*
+py_venv
