@@ -14,7 +14,7 @@
 void Fit::setData(int _d[Phoenix::data_maxN]) {
   std::copy(_d,_d+Ndata,data);
 }
-void Fit::setModel(int i,Phoenix::pArray _m) {
+void Fit::setModel(int i,Phoenix::dataArr _m) {
   std::copy(_m,_m+Ndata,model[i]);
 }
 void Fit::Load() {
@@ -22,6 +22,8 @@ void Fit::Load() {
   Phoenix::Ndata = Ndata;
   Phoenix::data = data;
   Phoenix::model = model;
+  Phoenix::pull_centroid = parCentroid;
+  Phoenix::pull_sigma = parSigma;
   fitter = std::make_unique<TMinuit>(Nmodel);
   fitter->SetFCN(Phoenix::FCN);
   for(int i = 0;i<Nmodel;++i)
@@ -35,4 +37,7 @@ void Fit::doFit() {
   int ierflg;
   fitter->mnexcm("MINIMIZE", (double []){5000},1,ierflg);
   fitter->mnexcm("HESSE", 0,0,ierflg);
+}
+void Fit::Execute(const std::string &cmd) {
+  fitter->Command(cmd.c_str());
 }

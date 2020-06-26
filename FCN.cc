@@ -3,15 +3,15 @@
 // Insitute: Physics Department, Princeton Unviersity, Princeton, NJ 08542, USA
 // Date: 2020 June 25th.
 // Version: v1.0
-// Description: Phoenix, a binned likleihood fitter
-// Liscence: MIT
+// Description: Phoenix, a binned likleihood fitter // Liscence: MIT
 /*****************Please don't remove this part from the code*****************************/
 #include "FCN.h"
 #include <functional>
 #include <cmath>
 namespace Phoenix {
   int *data;
-  pArray *model;
+  dataArr *model;
+  double *pull_centroid,*pull_sigma;
   int Nmodel;
   int Ndata;
   void transform(double out[data_maxN],int maxN,std::function<double(int rank)> f) {
@@ -44,7 +44,10 @@ namespace Phoenix {
               double lambda = model_sum[rank];
               return fij*(1-k/lambda);
               });
-          gin[i] = reduce(dFdp,Ndata);
+          double dpulldp
+            = pull_centroid[i]>0 && (pull_sigma[i]>0||par[i]>pull_centroid[i])?
+            2*(par[i]-pull_centroid[i])/pull_sigma[i]/pull_sigma[i]:0;
+          gin[i] = reduce(dFdp,Ndata)+dpulldp;
         }
         break;
       case 3: // finish
@@ -56,7 +59,12 @@ namespace Phoenix {
           double lambda = model_sum[rank];
           return -k*log(lambda)+lgamma(k+1)+lambda;
         });
-        f = reduce(LL,Ndata);
+        double pull[model_maxN];
+        transform(pull,Nmodel,[=](int i) {
+            return pull_centroid[i]>0 && (pull_sigma[i]>0||par[i]>pull_centroid[i])?
+            pow((par[i]-pull_centroid[i])/pull_sigma[i],2):0;
+        });
+        f = reduce(LL,Ndata)+reduce(pull,Nmodel);
     }
   }
 }

@@ -10,9 +10,11 @@
 namespace Phoenix {
   constexpr int data_maxN = 2000;
   constexpr int model_maxN = 20;
-  using pArray = double [Phoenix::model_maxN];
+  using dataArr = double [Phoenix::data_maxN];
+  using parArr = double [Phoenix::model_maxN];
   extern int *data;
-  extern pArray *model;
+  extern dataArr *model;
+  extern double *pull_centroid,*pull_sigma;
   extern int Nmodel;
   extern int Ndata;
 
