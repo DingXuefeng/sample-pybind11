@@ -1,2 +1,2 @@
-# Phoenix
-New Borexino fitter
+# sample-pybind11
+Sample project for using pybind11
